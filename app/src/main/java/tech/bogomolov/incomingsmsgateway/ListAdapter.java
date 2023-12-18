@@ -72,6 +72,7 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             receiver.callWebHook(info, config);
         }
+        Toast.makeText(this.getContext(),"Message sent: check the logs", Toast.LENGTH_LONG).show();
     }
     public void onDeleteClick(View view) {
         ListAdapter listAdapter = this;
