@@ -3,9 +3,11 @@ package tech.bogomolov.incomingsmsgateway;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
+import androidx.annotation.RequiresApi;
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -25,6 +27,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
     private Context context;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onReceive(Context context, Intent intent) {
         this.context = context;
@@ -39,12 +42,18 @@ public class SmsReceiver extends BroadcastReceiver {
             return;
         }
 
-        StringBuilder content = new StringBuilder();
         final SmsMessage[] messages = new SmsMessage[pdus.length];
         for (int i = 0; i < pdus.length; i++) {
             messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-            content.append(messages[i].getDisplayMessageBody());
-        }
+         }
+
+        this.notifyMessages(this.context, messages, this.detectSim(bundle));
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void notifyMessages(Context context, SmsMessage[] messages, String sim ) {
+
 
         ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
         String asterisk = context.getString(R.string.asterisk);
@@ -59,36 +68,46 @@ public class SmsReceiver extends BroadcastReceiver {
             }
         }
 
+        StringBuilder content = new StringBuilder();
+        for (int i = 0; i < messages.length; i++) {
+             content.append(messages[i].getDisplayMessageBody());
+        }
+
         if (matchedConfig == null) {
             return;
         }
 
-        String messageContent = matchedConfig.getTemplate()
-                .replaceAll("%from%", sender)
-                .replaceAll("%sentStamp%", String.valueOf(messages[0].getTimestampMillis()))
-                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
-                .replaceAll("%sim%", this.detectSim(bundle))
-                .replaceAll("%text%",
-                        Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString())));
-        this.callWebHook(
-                matchedConfig.getUrl(),
-                messageContent,
-                matchedConfig.getHeaders(),
-                matchedConfig.getIgnoreSsl()
-        );
+        MessageInfo info  = new MessageInfo();
+        info.sender = sender;
+        info.sim = sim;
+        info.content =Matcher.quoteReplacement(StringEscapeUtils.escapeJson(content.toString()));
+        info.timestamp = String.valueOf(System.currentTimeMillis());
+
+
+        this.callWebHook(info,matchedConfig);
     }
 
-    protected void callWebHook(String url, String message, String headers, boolean ignoreSsl) {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    protected void callWebHook(MessageInfo info, ForwardingConfig matchedConfig) {
+
+        String message = matchedConfig.getTemplate()
+                .replaceAll("%from%", info.sender)
+                .replaceAll("%sentStamp%", info.timestamp)
+                .replaceAll("%receivedStamp%", String.valueOf(System.currentTimeMillis()))
+                .replaceAll("%sim%", info.sim)
+                .replaceAll("%text%", info.content);
+
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
         Data data = new Data.Builder()
-                .putString(WebHookWorkRequest.DATA_URL, url)
+                .putString(WebHookWorkRequest.DATA_URL, matchedConfig.getFullUrl())
+                .putString(WebHookWorkRequest.DATA_PHONE, matchedConfig.getPhoneNumber())
                 .putString(WebHookWorkRequest.DATA_TEXT, message)
-                .putString(WebHookWorkRequest.DATA_HEADERS, headers)
-                .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, ignoreSsl)
+                .putString(WebHookWorkRequest.DATA_HEADERS, matchedConfig.getHeaders())
+                .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, matchedConfig.getIgnoreSsl())
                 .build();
 
         WorkRequest webhookWorkRequest =

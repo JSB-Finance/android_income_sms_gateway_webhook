@@ -58,7 +58,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void testEmptySenderError() {
+    public void testEmptyPhoneNumberError() {
         onView(withId(R.id.btn_add)).perform(click());
         ViewInteraction dialog = onView(withId(R.id.dialog_add));
 
@@ -67,7 +67,23 @@ public class MainActivityTest {
 
         onView(withText(R.string.btn_add)).perform(click());
 
-        onView(withId(R.id.input_phone))
+        onView(withId(R.id.phone_number))
+                .check(matches(hasErrorText(getResourceString(R.string.error_empty_sender))));
+
+        dialog.check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testEmptyOracleSecretError() {
+        onView(withId(R.id.btn_add)).perform(click());
+        ViewInteraction dialog = onView(withId(R.id.dialog_add));
+
+        onView(withId(R.id.input_url))
+                .perform(typeText("https://example.com"));
+
+        onView(withText(R.string.btn_add)).perform(click());
+
+        onView(withId(R.id.oracle_secret))
                 .check(matches(hasErrorText(getResourceString(R.string.error_empty_sender))));
 
         dialog.check(matches(isDisplayed()));
@@ -78,7 +94,7 @@ public class MainActivityTest {
         onView(withId(R.id.btn_add)).perform(click());
         ViewInteraction dialog = onView(withId(R.id.dialog_add));
 
-        onView(withId(R.id.input_phone))
+        onView(withId(R.id.oracle_secret))
                 .perform(typeText("test"));
 
         onView(withText(R.string.btn_add)).perform(click());
@@ -94,7 +110,7 @@ public class MainActivityTest {
         onView(withId(R.id.btn_add)).perform(click());
         ViewInteraction dialog = onView(withId(R.id.dialog_add));
 
-        onView(withId(R.id.input_phone))
+        onView(withId(R.id.oracle_secret))
                 .perform(typeText("test"));
 
         onView(withId(R.id.input_url))
@@ -108,93 +124,6 @@ public class MainActivityTest {
         dialog.check(matches(isDisplayed()));
     }
 
-    @Test
-    public void tesEmptyJsonTemplateError() {
-        onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
-
-        onView(withId(R.id.input_phone))
-                .perform(typeText("test"));
-
-        onView(withId(R.id.input_url))
-                .perform(typeText("https://example.com"));
-
-        onView(withId(R.id.input_json_template))
-                .perform(replaceText(""));
-
-        onView(withText(R.string.btn_add)).perform(click());
-
-        onView(withId(R.id.input_json_template))
-                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
-
-        dialog.check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void tesWrongJsonTemplateError() {
-        onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
-
-        onView(withId(R.id.input_phone))
-                .perform(typeText("test"));
-
-        onView(withId(R.id.input_url))
-                .perform(typeText("https://example.com"));
-
-        onView(withId(R.id.input_json_template))
-                .perform(replaceText("{"));
-
-        onView(withText(R.string.btn_add)).perform(click());
-
-        onView(withId(R.id.input_json_template))
-                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
-
-        dialog.check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void tesEmptyJsonHeadersError() {
-        onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
-
-        onView(withId(R.id.input_phone))
-                .perform(typeText("test"));
-
-        onView(withId(R.id.input_url))
-                .perform(typeText("https://example.com"));
-
-        onView(withId(R.id.input_json_headers))
-                .perform(replaceText(""));
-
-        onView(withText(R.string.btn_add)).perform(click());
-
-        onView(withId(R.id.input_json_headers))
-                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
-
-        dialog.check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void tesWrongJsonHeadersError() {
-        onView(withId(R.id.btn_add)).perform(click());
-        ViewInteraction dialog = onView(withId(R.id.dialog_add));
-
-        onView(withId(R.id.input_phone))
-                .perform(typeText("test"));
-
-        onView(withId(R.id.input_url))
-                .perform(typeText("https://example.com"));
-
-        onView(withId(R.id.input_json_headers))
-                .perform(replaceText("{"));
-
-        onView(withText(R.string.btn_add)).perform(click());
-
-        onView(withId(R.id.input_json_headers))
-                .check(matches(hasErrorText(getResourceString(R.string.error_wrong_json))));
-
-        dialog.check(matches(isDisplayed()));
-    }
 
     @Test
     public void testAddDeleteRecord() {
@@ -202,7 +131,7 @@ public class MainActivityTest {
         String url = "https://example.com";
 
         onView(withId(R.id.btn_add)).perform(click());
-        onView(withId(R.id.input_phone)).perform(typeText(sender));
+        onView(withId(R.id.oracle_secret)).perform(typeText(sender));
         onView(withId(R.id.input_url)).perform(typeText(url));
 
         onView(withText(R.string.btn_add)).perform(click());

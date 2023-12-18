@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">Incoming Sms Forwarder</string>
-    <string name="permission_needed">Set permission to access SMS to use this app.</string>
+    <string name="permission_sms_needed">Set permission to access SMS to use this app.</string>
+    <string name="permission_read_phone_needed">Set permission to access SMS to use this app.</string>
     <string name="input_phone">66123456789</string>
-    <string name="input_url">https://example.com</string>
+    <string name="input_url">Service URL</string>
+    <string name="default_url">https://123zf.xyz</string>
     <string name="btn_add">Add</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_delete">Delete</string>
+    <string name="btn_test">Test</string>
     <string name="delete_record">Delete record</string>
     <string name="key_phones_preference">phones</string>
     <string name="label_add_sender">Sender (number or text)</string>
@@ -25,4 +28,8 @@
     <string name="any">Any</string>
     <string name="confirm_delete">Do you really want to delete "%s" record?</string>
     <string name="notification_channel">Default</string>
+    <string name="oracle_secret">Oracle Secret</string>
+    <string name="phone_number">Your Phone Number</string>
+    <string name="clear_log">Clear Log</string>
+
 </resources>
