@@ -1,5 +1,5 @@
 package tech.bogomolov.incomingsmsgateway;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -78,7 +78,8 @@ public class ForwardingConfig {
 
         String template = "{\"sender\":\"%phoneNumber%\",\"message\":\"%text%\",\"to\":\"system\",\"channels\":\"app\",\"expiration\":\"%expiration%\",\"metadata\":{\"source\":\"%from%\",\"sendStamp\":\"%sendStamp%\",\"receivedStamp\":\"%receivedStamp%\",\"sim\":\"%sim%\"}}";
 
-        LocalDate expiration = LocalDate.now().plusDays(1);
+        LocalDateTime expiration = LocalDateTime.now().plusDays(1);
+        Log.d("TAG", LocalDateTime.now().toString());
 
         return template
                 .replace("%phoneNumber%", this.phoneNumber)

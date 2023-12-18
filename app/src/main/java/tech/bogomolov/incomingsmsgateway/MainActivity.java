@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             final EditText oracleSecretInput =  view.findViewById(R.id.oracle_secret);
             final EditText phoneNumberInput =  view.findViewById(R.id.phone_number);
             final EditText urlInput =  view.findViewById(R.id.url_input);
-            urlInput.setText("https://123zf.xyz/notification-service/v1.1");
+            urlInput.setText("https://123zf.xyz/notifications-service/v1.1");
 
             builder.setView(view);
             builder.setPositiveButton(R.string.btn_add, null);

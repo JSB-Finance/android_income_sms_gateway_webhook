@@ -79,6 +79,7 @@ public class WebHookWorkRequest extends Worker {
     @SuppressLint({"AllowAllHostnameVerifier"})
     private String makeRequest(String urlString, String text, String headers, boolean ignoreSsl) {
         String result = RESULT_SUCCESS;
+        String account = getInputData().getString(DATA_PHONE).toString();
 
         Log.i("SmsGateway", "request " + urlString);
 
@@ -133,7 +134,6 @@ public class WebHookWorkRequest extends Worker {
 
             char code = Integer.toString(urlConnection.getResponseCode()).charAt(0);
 
-            String account = getInputData().getString(DATA_PHONE).toString();
 
             if (!Character.toString(code).equals("2")) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
@@ -154,12 +154,15 @@ public class WebHookWorkRequest extends Worker {
 
         } catch (MalformedURLException e) {
             result = RESULT_ERROR;
+            SmsLogModel.error(account, e.getMessage());
             Log.e("SmsGateway", "MalformedURLException " + e);
         } catch (IOException e) {
             result = RESULT_RETRY;
+            SmsLogModel.error(account, e.getMessage());
             Log.e("SmsGateway", "Exception " + e);
         } catch (Exception e) {
             result = RESULT_ERROR;
+            SmsLogModel.error(account, e.getMessage());
             Log.e("SmsGateway", "Exception " + e);
         } finally {
             if (urlConnection != null) {
