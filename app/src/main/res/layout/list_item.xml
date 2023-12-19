@@ -32,8 +32,6 @@
         tools:ignore="RtlSymmetry">
 
 
-
-
         <Button
             android:id="@+id/test_button"
             style="@style/Widget.MaterialComponents.Button.TextButton"

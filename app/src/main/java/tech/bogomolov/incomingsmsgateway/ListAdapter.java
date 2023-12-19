@@ -20,9 +20,9 @@ import android.telephony.SmsMessage;
 
 public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
     final private ArrayList<ForwardingConfig> dataSet;
-    Context context;
+    MainActivity context;
 
-    public ListAdapter(ArrayList<ForwardingConfig> data, Context context) {
+    public ListAdapter(ArrayList<ForwardingConfig> data, MainActivity context) {
         super(context, R.layout.list_item, data);
         this.dataSet = data;
         this.context = context;
@@ -65,7 +65,7 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
 
         SmsReceiver receiver = new SmsReceiver();
         MessageInfo info = new MessageInfo();
-        info.content = "SMS test fom SMS App";
+        info.content = "SMS test fom SMS App OTP 000000";
         info.sim = "Test";
         info.sender = "+86000000000000";
 
@@ -88,8 +88,12 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         builder.setPositiveButton(R.string.btn_delete, (dialog, id) -> {
             listAdapter.remove(config);
             config.remove();
+            context.toggleButtons(true);
+
         });
         builder.setNegativeButton(R.string.btn_cancel, null);
         builder.show();
+
+
     }
 }

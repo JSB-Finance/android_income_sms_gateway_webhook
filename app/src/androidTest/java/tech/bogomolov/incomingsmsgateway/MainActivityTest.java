@@ -167,4 +167,5 @@ public class MainActivityTest {
         Context targetContext = ApplicationProvider.getApplicationContext();
         return targetContext.getResources().getString(id);
     }
+
 }

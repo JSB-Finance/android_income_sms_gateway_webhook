@@ -22,7 +22,6 @@ public class ForwardingConfig {
     private static final String KEY_ORACLE_SECRET = "oracle_secret";
     private static final String KEY_PHONE_NUMBER = "phone_number";
 
-
     private String sender;
     private String url;
 
@@ -59,7 +58,10 @@ public class ForwardingConfig {
     }
 
     public String getFullUrl() {
-        return this.url + "/oracles/message";
+        if(this.url.indexOf("localhost") > 0) {
+            return this.url + "/oracles/message";
+        }
+        return this.url + "/notifications-service/v1.1/oracles/message";
     }
 
     public void setUrl(String url) {
@@ -119,7 +121,7 @@ public class ForwardingConfig {
     }
 
     public static String getDefaultJsonTemplate() {
-        return "{\"merchantNo\":\"%merchantNo%\",\"imei\":\"%imei%\",\"otp\":\"%text%\",\"meta\":{\"sentStamp\":\"%sendStamp%\",\"receivedStamp\":\"%receivedStamp%\",\"sim\":\"%sim%\",\"from\":\"%from%\"}}'";
+        return "{\"merchantNo\":\"%merchantNo%\",\"imei\":\"%imei%\",\"otp\":\"%text%\",\"meta\":{\"sentStamp\":\"%sentStamp%\",\"receivedStamp\":\"%receivedStamp%\",\"sim\":\"%sim%\",\"from\":\"%from%\"}}'";
     }
 
 

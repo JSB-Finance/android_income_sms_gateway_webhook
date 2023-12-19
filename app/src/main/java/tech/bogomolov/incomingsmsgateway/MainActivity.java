@@ -98,17 +98,19 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         ListView listview = findViewById(R.id.listView);
 
-        ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
-
-        listAdapter = new ListAdapter(configs, context);
-        listview.setAdapter(listAdapter);
 
         FloatingActionButton fab = findViewById(R.id.btn_add);
         fab.setOnClickListener(this.showAddDialog());
 
+        ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
+
+        listAdapter = new ListAdapter(configs, this);
+        listview.setAdapter(listAdapter);
+
         FloatingActionButton logListButton = findViewById(R.id.button_log);
         logListButton.setOnClickListener(this.showLogButton());
 
+        this.toggleButtons(configs.size() == 0 );
         if (!this.isServiceRunning()) {
             this.startService();
         }
@@ -147,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             final EditText oracleSecretInput =  view.findViewById(R.id.oracle_secret);
             final EditText phoneNumberInput =  view.findViewById(R.id.phone_number);
             final EditText urlInput =  view.findViewById(R.id.url_input);
-            urlInput.setText("https://123zf.xyz/notifications-service/v1.1");
+            urlInput.setText("https://123zf.xyz");
 
             builder.setView(view);
             builder.setPositiveButton(R.string.btn_add, null);
@@ -197,6 +199,8 @@ public class MainActivity extends AppCompatActivity {
                 listAdapter.add(config);
 
                 dialog.dismiss();
+                this.toggleButtons(false);
+
             });
         };
     }
@@ -224,6 +228,23 @@ public class MainActivity extends AppCompatActivity {
 
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
          };
+    }
+
+    public void toggleButtons(boolean show) {
+
+        FloatingActionButton fab = findViewById(R.id.btn_add);
+        FloatingActionButton logListButton = findViewById(R.id.button_log);
+
+        if(!show ) {
+            fab.hide();
+            logListButton.show();
+            return;
+        }
+
+        fab.show();
+        logListButton.hide();
+
+
     }
 
 }

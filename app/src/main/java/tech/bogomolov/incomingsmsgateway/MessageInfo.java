@@ -22,6 +22,6 @@ public class MessageInfo {
      public String timestamp;
 
      public MessageInfo()  {
-          this.timestamp=  String.valueOf(System.currentTimeMillis());
+          this.timestamp =  String.valueOf(System.currentTimeMillis());
      }
 }

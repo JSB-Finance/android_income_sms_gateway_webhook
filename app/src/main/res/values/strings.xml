@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Incoming Sms Forwarder</string>
+    <string name="app_name">OTP Monitor</string>
     <string name="permission_sms_needed">Set permission to access SMS to use this app.</string>
     <string name="permission_read_phone_needed">Set permission to access SMS to use this app.</string>
     <string name="input_phone">66123456789</string>
