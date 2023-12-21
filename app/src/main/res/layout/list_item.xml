@@ -15,68 +15,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/label_sender"
+        android:text="@string/phone_number"
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/text_sender"
+        android:id="@+id/phone_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#000"
         android:textSize="18sp"
-        tools:ignore="RtlSymmetry" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:text="@string/label_url"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/text_url"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#000"
-        android:textSize="18sp"
-        tools:ignore="RtlSymmetry" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:text="@string/label_json_template"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/text_template"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#000"
-        android:textSize="11sp"
-        android:typeface="monospace"
-        tools:ignore="RtlSymmetry" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:text="@string/label_json_headers"
-        android:textSize="12sp" />
-
-    <TextView
-        android:id="@+id/text_headers"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#000"
-        android:textSize="11sp"
-        android:typeface="monospace"
         tools:ignore="RtlSymmetry" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         tools:ignore="RtlSymmetry">
+
+
+        <Button
+            android:id="@+id/test_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:height="10dp"
+            android:minHeight="48dp"
+            android:text="@string/btn_test"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp" />
+
+
 
         <Button
             android:id="@+id/delete_button"
@@ -86,10 +56,11 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:height="10dp"
-            android:minHeight="32dp"
+            android:minHeight="48dp"
             android:text="@string/btn_delete"
             android:textAllCaps="true"
             android:textColor="@color/colorDanger"
             android:textSize="14sp" />
+
     </RelativeLayout>
 </LinearLayout>

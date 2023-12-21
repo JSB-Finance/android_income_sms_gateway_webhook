@@ -3,9 +3,9 @@
     android:layout_height="match_parent"
     android:fadeScrollbars="false">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/dialog_add"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:scrollbars="vertical">
@@ -16,11 +16,11 @@
             android:layout_marginStart="12dp"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="16dp"
-            android:labelFor="@+id/input_phone"
-            android:text="@string/label_add_sender" />
+            android:labelFor="@+id/oracle_secret"
+            android:text="@string/oracle_secret" />
 
         <EditText
-            android:id="@+id/input_phone"
+            android:id="@+id/oracle_secret"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -28,119 +28,53 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="4dp"
-            android:hint="@string/hint_sender"
+            android:hint="@string/oracle_secret"
             android:inputType="text" />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="-4dp"
-            android:text="@string/sender_recommendation"
-            android:textSize="10sp" />
-
-        <TextView
-            android:layout_width="match_parent"
+             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="16dp"
-            android:labelFor="@+id/input_phone"
-            android:text="@string/label_url" />
+            android:labelFor="@+id/phone_number"
+            android:text="@string/phone_number" />
 
         <EditText
-            android:id="@+id/input_url"
+            android:id="@+id/phone_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="12dp"
-            android:fontFamily="sans-serif"
+            android:layout_marginBottom="4dp"
+            android:hint="@string/phone_number"
+            android:inputType="text" />
+
+        <TextView
+             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="16dp"
+            android:labelFor="@+id/input_url"
+            android:text="@string/input_url" />
+
+        <EditText
+            android:id="@+id/url_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="4dp"
             android:hint="@string/input_url"
-            android:inputType="textUri" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:labelFor="@+id/input_json_template"
-            android:text="@string/label_json_template" />
-
-        <EditText
-            android:id="@+id/input_json_template"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="4dp"
-            android:inputType="textMultiLine"
-            android:maxLines="10"
-            android:textSize="11sp"
-            android:typeface="monospace" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="-4dp"
-            android:text="@string/json_template_recommendation"
-            android:textSize="11sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="16dp"
-            android:labelFor="@+id/input_json_headers"
-            android:text="@string/label_json_headers" />
-
-        <EditText
-            android:id="@+id/input_json_headers"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="4dp"
-            android:inputType="textMultiLine"
-            android:maxLines="5"
-            android:textSize="11sp"
-            android:typeface="monospace" />
+            android:inputType="text" />
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_marginStart="12dp"
-                android:layout_marginLeft="12dp"
-                android:layout_marginTop="16dp"
-                android:labelFor="@+id/input_ignore_ssl"
-                android:text="@string/label_ignore_ssl" />
-
-            <CheckBox
-                android:id="@+id/input_ignore_ssl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginStart="12dp"
-                android:layout_marginLeft="12dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp" />
-
-        </RelativeLayout>
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

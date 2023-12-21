@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,9 +29,12 @@ import java.util.Iterator;
 import javax.net.ssl.HttpsURLConnection;
 
 import tech.bogomolov.incomingsmsgateway.SSLSocketFactory.TLSSocketFactory;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class WebHookWorkRequest extends Worker {
 
+    public final static String DATA_PHONE = "PHONE";
     public final static String DATA_URL = "URL";
     public final static String DATA_TEXT = "TEXT";
     public final static String DATA_HEADERS = "HEADERS";
@@ -75,6 +79,7 @@ public class WebHookWorkRequest extends Worker {
     @SuppressLint({"AllowAllHostnameVerifier"})
     private String makeRequest(String urlString, String text, String headers, boolean ignoreSsl) {
         String result = RESULT_SUCCESS;
+        String account = getInputData().getString(DATA_PHONE).toString();
 
         Log.i("SmsGateway", "request " + urlString);
 
@@ -125,20 +130,39 @@ public class WebHookWorkRequest extends Worker {
             writer.close();
             out.close();
 
-            new BufferedInputStream(urlConnection.getInputStream());
+
 
             char code = Integer.toString(urlConnection.getResponseCode()).charAt(0);
+
+
             if (!Character.toString(code).equals("2")) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
+                StringBuilder errorResponse = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    errorResponse.append(line);
+                }
+                JSONObject jsonObject = new JSONObject(errorResponse.toString());
+                String error = jsonObject.getString("err");
+                Log.e("SmsGateway", "HTTP Error Response: " + error);
+                 SmsLogModel.error(account, error);
                 result = RESULT_RETRY;
+            } else {
+                SmsLogModel.success(account, "OK");
             }
+
+
         } catch (MalformedURLException e) {
             result = RESULT_ERROR;
+            SmsLogModel.error(account, e.getMessage());
             Log.e("SmsGateway", "MalformedURLException " + e);
         } catch (IOException e) {
             result = RESULT_RETRY;
+            SmsLogModel.error(account, e.getMessage());
             Log.e("SmsGateway", "Exception " + e);
         } catch (Exception e) {
             result = RESULT_ERROR;
+            SmsLogModel.error(account, e.getMessage());
             Log.e("SmsGateway", "Exception " + e);
         } finally {
             if (urlConnection != null) {

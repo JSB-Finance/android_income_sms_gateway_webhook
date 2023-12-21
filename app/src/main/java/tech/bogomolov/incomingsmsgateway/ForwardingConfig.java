@@ -1,8 +1,12 @@
 package tech.bogomolov.incomingsmsgateway;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,18 +18,31 @@ public class ForwardingConfig {
     final private Context context;
 
     private static final String KEY_URL = "url";
-    private static final String KEY_TEMPLATE = "template";
-    private static final String KEY_HEADERS = "headers";
     private static final String KEY_IGNORE_SSL = "ignore_ssl";
+    private static final String KEY_ORACLE_SECRET = "oracle_secret";
+    private static final String KEY_PHONE_NUMBER = "phone_number";
 
     private String sender;
     private String url;
-    private String template;
-    private String headers;
+
+    private String oracleSecret;
+    private String phoneNumber;
     private boolean ignoreSsl = false;
 
     public ForwardingConfig(Context context) {
         this.context = context;
+    }
+
+    public void setOracleSecret(String oracleSecret) {
+        this.oracleSecret = oracleSecret;
+    }
+
+    public String getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getSender() {
@@ -40,24 +57,42 @@ public class ForwardingConfig {
         return this.url;
     }
 
+    public String getFullUrl() {
+        if(this.url.indexOf("localhost") > 0) {
+            return this.url + "/oracles/message";
+        }
+        return this.url + "/notifications-service/v1.1/oracles/message";
+    }
+
     public void setUrl(String url) {
         this.url = url;
     }
 
-    public String getTemplate() {
-        return this.template;
-    }
-
-    public void setTemplate(String template) {
-        this.template = template;
-    }
-
     public String getHeaders() {
-        return this.headers;
+        if(this.oracleSecret == "") {
+            throw new Error("Can not get headers because oracle setter is not set");
+        }
+        return "{\"User-agent\":\"SMS Forwarder App\", \"Content-Type\":\"application/json\", \"x-oracle-secret\":\""+this.oracleSecret+"\"}";
     }
 
-    public void setHeaders(String headers) {
-        this.headers = headers;
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String getTemplate() {
+
+        String template = "{\"sender\":\"%phoneNumber%\",\"message\":\"%text%\",\"to\":\"system\",\"channels\":\"app\",\"expiration\":\"%expiration%\",\"metadata\":{\"source\":\"%from%\",\"sendStamp\":\"%sendStamp%\",\"receivedStamp\":\"%receivedStamp%\",\"sim\":\"%sim%\"}}";
+
+        LocalDateTime expiration = LocalDateTime.now().plusDays(1);
+        Log.d("TAG", LocalDateTime.now().toString());
+
+        return template
+                .replace("%phoneNumber%", this.phoneNumber)
+                .replace("%expiration%", expiration.format(DateTimeFormatter.ISO_DATE));
+    }
+
+    public String getBody() {
+        if(this.oracleSecret == "") {
+            throw new Error("Can not get headers because oracle setter is not set");
+        }
+        return "{\"User-agent\":\"SMS Forwarder App\", \"Content-Type\":\"application/json\", \"x-token-secret\":\""+this.oracleSecret+"\"}";
     }
 
     public boolean getIgnoreSsl() {
@@ -72,8 +107,8 @@ public class ForwardingConfig {
         try {
             JSONObject json = new JSONObject();
             json.put(KEY_URL, this.url);
-            json.put(KEY_TEMPLATE, this.template);
-            json.put(KEY_HEADERS, this.headers);
+            json.put(KEY_ORACLE_SECRET, this.oracleSecret);
+            json.put(KEY_PHONE_NUMBER, this.phoneNumber);
             json.put(KEY_IGNORE_SSL, this.ignoreSsl);
 
             SharedPreferences.Editor editor = getEditor(context);
@@ -86,12 +121,9 @@ public class ForwardingConfig {
     }
 
     public static String getDefaultJsonTemplate() {
-        return "{\n  \"from\":\"%from%\",\n  \"text\":\"%text%\",\n  \"sentStamp\":%sentStamp%,\n  \"receivedStamp\":%receivedStamp%,\n  \"sim\":\"%sim%\"\n}";
+        return "{\"merchantNo\":\"%merchantNo%\",\"imei\":\"%imei%\",\"otp\":\"%text%\",\"meta\":{\"sentStamp\":\"%sentStamp%\",\"receivedStamp\":\"%receivedStamp%\",\"sim\":\"%sim%\",\"from\":\"%from%\"}}'";
     }
 
-    public static String getDefaultJsonHeaders() {
-        return "{\"User-agent\":\"SMS Forwarder App\"}";
-    }
 
     public static ArrayList<ForwardingConfig> getAll(Context context) {
         SharedPreferences sharedPref = getPreference(context);
@@ -99,8 +131,11 @@ public class ForwardingConfig {
 
         ArrayList<ForwardingConfig> configs = new ArrayList<>();
 
+
         for (Map.Entry<String, ?> entry : sharedPrefs.entrySet()) {
+
             ForwardingConfig config = new ForwardingConfig(context);
+
             config.setSender(entry.getKey());
 
             String value = (String) entry.getValue();
@@ -109,8 +144,8 @@ public class ForwardingConfig {
                 try {
                     JSONObject json = new JSONObject(value);
                     config.setUrl(json.getString(KEY_URL));
-                    config.setTemplate(json.getString(KEY_TEMPLATE));
-                    config.setHeaders(json.getString(KEY_HEADERS));
+                    config.setOracleSecret(json.getString(KEY_ORACLE_SECRET));
+                    config.setPhoneNumber(json.getString(KEY_PHONE_NUMBER));
 
                     try {
                         config.setIgnoreSsl(json.getBoolean(KEY_IGNORE_SSL));
@@ -121,8 +156,6 @@ public class ForwardingConfig {
                 }
             } else {
                 config.setUrl(value);
-                config.setTemplate(ForwardingConfig.getDefaultJsonTemplate());
-                config.setHeaders(ForwardingConfig.getDefaultJsonHeaders());
             }
 
             configs.add(config);

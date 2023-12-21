@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,14 +22,11 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
+
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "SMSAPP"; // Tag for identifying log messages
 
     private Context context;
     private ListAdapter listAdapter;
@@ -42,8 +38,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /**
+         * RECIEVE_SMS: To read incoming SMS
+         * READ_PHONE_STAT: To get the phone imei
+         */
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, PERMISSION_CODE);
+              ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, PERMISSION_CODE);
         } else {
             showList();
         }
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
     private void handleUncaughtException (Thread thread, Throwable e) {
 
         // The following shows what I'd like, though it won't work like this.
@@ -63,40 +64,53 @@ public class MainActivity extends AppCompatActivity {
 
         // Add some code logic if needed based on your requirement
     }
+
+
+    private boolean checkPermission(String myPermission, @NonNull String[] permissions, @NonNull int[] grantResults ) {
+        for (int i = 0; i < permissions.length; i++) {
+            if (!permissions[i].equals(myPermission)) {
+                continue;
+            }
+
+            return grantResults[i] == PackageManager.PERMISSION_GRANTED;
+        }
+        return false;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode != PERMISSION_CODE) {
             return;
         }
-        for (int i = 0; i < permissions.length; i++) {
-            if (!permissions[i].equals(Manifest.permission.RECEIVE_SMS)) {
-                continue;
-            }
 
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                showList();
-            } else {
-                showInfo(getResources().getString(R.string.permission_needed));
-            }
-
+        if(!this.checkPermission(Manifest.permission.RECEIVE_SMS, permissions, grantResults)){
+            showError(getResources().getString(R.string.permission_sms_needed));
             return;
         }
+
+
+        showList();
     }
 
     private void showList() {
-        showInfo("");
+        showError("");
 
         context = this;
         ListView listview = findViewById(R.id.listView);
 
-        ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
-
-        listAdapter = new ListAdapter(configs, context);
-        listview.setAdapter(listAdapter);
 
         FloatingActionButton fab = findViewById(R.id.btn_add);
         fab.setOnClickListener(this.showAddDialog());
 
+        ArrayList<ForwardingConfig> configs = ForwardingConfig.getAll(context);
+
+        listAdapter = new ListAdapter(configs, this);
+        listview.setAdapter(listAdapter);
+
+        FloatingActionButton logListButton = findViewById(R.id.button_log);
+        logListButton.setOnClickListener(this.showLogButton());
+
+        this.toggleButtons(configs.size() == 0 );
         if (!this.isServiceRunning()) {
             this.startService();
         }
@@ -123,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showInfo(String text) {
+    private void showError(String text) {
         TextView notice = findViewById(R.id.info_notice);
         notice.setText(text);
     }
@@ -132,70 +146,105 @@ public class MainActivity extends AppCompatActivity {
         return v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             View view = getLayoutInflater().inflate(R.layout.dialog_add, null);
-            final EditText senderInput = view.findViewById(R.id.input_phone);
-            final EditText urlInput = view.findViewById(R.id.input_url);
-            final EditText templateInput = view.findViewById(R.id.input_json_template);
-            final EditText headersInput = view.findViewById(R.id.input_json_headers);
-            final CheckBox ignoreSslCheckbox = view.findViewById(R.id.input_ignore_ssl);
-
-            templateInput.setText(ForwardingConfig.getDefaultJsonTemplate());
-            headersInput.setText(ForwardingConfig.getDefaultJsonHeaders());
+            final EditText oracleSecretInput =  view.findViewById(R.id.oracle_secret);
+            final EditText phoneNumberInput =  view.findViewById(R.id.phone_number);
+            final EditText urlInput =  view.findViewById(R.id.url_input);
+            urlInput.setText("https://123zf.xyz");
 
             builder.setView(view);
             builder.setPositiveButton(R.string.btn_add, null);
             builder.setNegativeButton(R.string.btn_cancel, null);
+
             final AlertDialog dialog = builder.show();
+
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view1 -> {
-                String sender = senderInput.getText().toString();
-                if (TextUtils.isEmpty(sender)) {
-                    senderInput.setError(getString(R.string.error_empty_sender));
+
+                String oracleSecret = oracleSecretInput.getText().toString();
+                if (TextUtils.isEmpty(oracleSecret)) {
+                    oracleSecretInput.setError("Please input a value");
                     return;
                 }
+
+                String phoneNumber = phoneNumberInput.getText().toString();
+                if (TextUtils.isEmpty(phoneNumber)) {
+                    phoneNumberInput.setError("Please input a value");
+                    return;
+                }
+
 
                 String url = urlInput.getText().toString();
                 if (TextUtils.isEmpty(url)) {
-                    urlInput.setError(getString(R.string.error_empty_url));
+                    urlInput.setError("Please input a value");
                     return;
                 }
 
-                try {
-                    new URL(url);
-                } catch (MalformedURLException e) {
-                    urlInput.setError(getString(R.string.error_wrong_url));
-                    return;
-                }
 
-                String template = templateInput.getText().toString();
-                try {
-                    new JSONObject(template);
-                } catch (JSONException e) {
-                    templateInput.setError(getString(R.string.error_wrong_json));
-                    return;
-                }
+                /**
+                 * For our project we just need the merchant no, rest of it can be harcoded
+                 */
+                String sender = "*";
 
-                String headers = headersInput.getText().toString();
-                try {
-                    new JSONObject(headers);
-                } catch (JSONException e) {
-                    headersInput.setError(getString(R.string.error_wrong_json));
-                    return;
-                }
-
-                boolean ignoreSsl = ignoreSslCheckbox.isChecked();
+                boolean ignoreSsl = false;
 
                 ForwardingConfig config = new ForwardingConfig(context);
+
+                config.setOracleSecret(oracleSecret);
+                config.setPhoneNumber(phoneNumber);
                 config.setSender(sender);
                 config.setUrl(url);
-                config.setTemplate(template);
-                config.setHeaders(headers);
                 config.setIgnoreSsl(ignoreSsl);
                 config.save();
 
                 listAdapter.add(config);
 
                 dialog.dismiss();
+                this.toggleButtons(false);
+
             });
         };
     }
+
+    private View.OnClickListener showLogButton() {
+        return v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            View view = getLayoutInflater().inflate(R.layout.list_log, null);
+            builder.setView(view);
+
+            // Find the ListView in the custom layout
+            ListView listView = view.findViewById(R.id.logView);
+
+            LogAdapter logAdapter = new LogAdapter(SmsLogModel.dataSet, context);
+            listView.setAdapter(logAdapter);
+
+            builder.setNegativeButton(R.string.btn_cancel, null);
+
+            final AlertDialog dialog = builder.show();
+
+            View clearLog = view.findViewById(R.id.clear_log);
+            clearLog.setOnClickListener( event -> logAdapter.clearDataSet());
+
+
+            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+         };
+    }
+
+    public void toggleButtons(boolean show) {
+
+        FloatingActionButton fab = findViewById(R.id.btn_add);
+        FloatingActionButton logListButton = findViewById(R.id.button_log);
+
+        if(!show ) {
+            fab.hide();
+            logListButton.show();
+            return;
+        }
+
+        fab.show();
+        logListButton.hide();
+
+
+    }
+
 }
