@@ -51,7 +51,7 @@ public class LogAdapter extends ArrayAdapter<SmsLogModel> {
         numberText.setText(log.phone);
 
         TextView messageText = row.findViewById(R.id.message);
-        messageText.setText(log.message);
+        messageText.setText(log.logMessage);
 
         if(!log.success) {
             messageText.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));

@@ -104,7 +104,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
         Data data = new Data.Builder()
                 .putString(WebHookWorkRequest.DATA_URL, matchedConfig.getFullUrl())
-                .putString(WebHookWorkRequest.DATA_PHONE, matchedConfig.getPhoneNumber())
+                .putString(WebHookWorkRequest.DATA_PHONE, info.sender)
                 .putString(WebHookWorkRequest.DATA_TEXT, message)
                 .putString(WebHookWorkRequest.DATA_HEADERS, matchedConfig.getHeaders())
                 .putBoolean(WebHookWorkRequest.DATA_IGNORE_SSL, matchedConfig.getIgnoreSsl())
