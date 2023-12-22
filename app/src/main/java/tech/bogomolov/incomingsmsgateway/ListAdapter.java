@@ -67,7 +67,7 @@ public class ListAdapter extends ArrayAdapter<ForwardingConfig> {
         MessageInfo info = new MessageInfo();
         info.content = "SMS test fom SMS App OTP 000000";
         info.sim = "Test";
-        info.sender = "+86000000000000";
+        info.sender = "000000000000";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             receiver.callWebHook(info, config);

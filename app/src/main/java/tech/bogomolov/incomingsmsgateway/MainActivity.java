@@ -26,7 +26,6 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "SMSAPP"; // Tag for identifying log messages
 
     private Context context;
     private ListAdapter listAdapter;

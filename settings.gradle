@@ -1,2 +1,2 @@
-rootProject.name='Incoming SMS Gateway'
+rootProject.name='OTP Monitor'
 include ':app'

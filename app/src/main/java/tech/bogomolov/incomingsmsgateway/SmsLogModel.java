@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 public class SmsLogModel {
      public static ArrayList<SmsLogModel> dataSet = new ArrayList<SmsLogModel>();
-     public static void success(String phone, String message) {
-          SmsLogModel log = new SmsLogModel(phone, message, true);
+     public static void success(String phone, String logMessage) {
+          SmsLogModel log = new SmsLogModel(phone, logMessage, true);
           dataSet.add(log);
      }
 
-     public static void error(String phone, String message) {
-          SmsLogModel log =  new SmsLogModel(phone, message, false);
+     public static void error(String phone, String logMessage) {
+          SmsLogModel log =  new SmsLogModel(phone, logMessage, false);
           dataSet.add(log);
      }
 
@@ -20,12 +20,12 @@ public class SmsLogModel {
 
 
      public String phone;
-     public String message;
+     public String logMessage;
      public boolean success;
 
-     private SmsLogModel(String phone, String message, boolean success) {
+     private SmsLogModel(String phone, String logMessage, boolean success) {
           this.phone = phone;
-          this.message = message;
+          this.logMessage = logMessage;
           this.success = success;
      }
 
